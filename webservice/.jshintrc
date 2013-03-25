@@ -1,0 +1,13 @@
+	{
+		"predef": {
+			"require": false,
+			"describe": false,
+			"it": false
+		},
+
+		"strict":true,
+
+		"node":true
+		
+	}
+	
