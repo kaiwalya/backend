@@ -5,7 +5,7 @@
 //Configuration//
 /////////////////
 
-var Config = require('./lib/config.js').Configuration;
+var Config = require('../lib/config.js').Configuration;
 var config = new Config();
 
 
@@ -16,7 +16,7 @@ var log = new Logger({name:"Webservice"});
 log.level(Logger.DEBUG);
 log.debug('Logging Initialized');
 
-var pacakgeConfig = require('./package.json');
+var pacakgeConfig = require('../package.json');
 log.info("Package version is: %s", JSON.stringify(pacakgeConfig.version, null, 2));
 
 var restify = require('restify');
@@ -35,3 +35,4 @@ server.listen(config.getAPIPort(), function() {
 });
 
 exports.ServiceConfig = Config;
+

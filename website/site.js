@@ -10,7 +10,7 @@ var log = new Logger({name:"Website"});
 log.level(Logger.DEBUG);
 log.debug('Logging Initialized');
 	
-var pacakgeConfig = require('./package.json');
+var pacakgeConfig = require('../package.json');
 log.info("Package version is: %s", JSON.stringify(pacakgeConfig.version, null, 2));
 
 var apiHost = "127.0.0.1";
