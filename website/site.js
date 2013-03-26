@@ -6,10 +6,10 @@
 /////////////////
 var Logger =  require('bunyan');
 
-var log = new Logger({name:"Website"});
+var log = new Logger({name: "Website"});
 log.level(Logger.DEBUG);
 log.debug('Logging Initialized');
-	
+
 var pacakgeConfig = require('../package.json');
 log.info("Package version is: %s", JSON.stringify(pacakgeConfig.version, null, 2));
 
@@ -30,31 +30,31 @@ function API(apiHost, apiPort, logger)
 	this.apiEP = "http://" + apiHost + ":" + apiPort;
 }
 
-API.prototype.getVersion = function(callback){
+API.prototype.getVersion = function (callback) {
 	var This = this;
 
 	var url = This.apiEP + "/version";
 	var opt = {
 		"url": url,
-		"method": 'GET' 
+		"method": 'GET'
 	};
 
 	This.logger.info(opt.method + " " + opt.url);
-	request(opt, function(err, res, body){
+	request(opt, function (err, res, body) {
 		callback(err, body);
 	});
 };
 
-app.get('/', function(req, res){
-	(new API(apiHost, apiPort, log)).getVersion(function(err, version){		
-		if(!err){
+app.get('/', function (req, res) {
+	(new API(apiHost, apiPort, log)).getVersion(function (err, version) {
+		if (!err) {
 			res.send("Website version = " + pacakgeConfig.version + "<br>" + "Webservice Version: " + version);
 		}
-		else{
+		else {
 			res.end();
 		}
 	});
-	
+
 });
 
 
