@@ -1,6 +1,6 @@
 'use strict';
 var packageRoot = '../';
-var service = require(packageRoot + 'webservice/service');
+var service = require(packageRoot + 'lib/service');
 
 describe('service', function () {
 	it('Exports ServiceConfig', function (done) {

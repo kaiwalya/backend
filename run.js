@@ -1,7 +1,7 @@
 setTimeout(function () {
-	require('./webservice/service', 2000);
+	require('./lib/service', 2000);
 });
 
 setTimeout(function () {
-	require('./website/site', 3000);
+	require('./lib/site', 3000);
 });
