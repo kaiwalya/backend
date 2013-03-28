@@ -6,7 +6,7 @@ else
 	echo "Updating NVM..."
 	~/.nvm/install.sh
 fi
-. ~/.profile
+. ~/.nvm/nvm.sh
 nvm install 0.10.1
 nvm use 0.10.1
 npm install -g jake
