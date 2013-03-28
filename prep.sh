@@ -16,6 +16,7 @@ npm install -g node-inspector
 npm install -g node-dev
 npm install -g supervisor
 npm install -g mocha
+npm install -g jscov
 pushd backend
 npm install
 popd
