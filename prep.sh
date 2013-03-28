@@ -22,7 +22,7 @@ npm install
 popd
 
 #Directory for logs
-mkdir logs
+mkdir -p logs
 
 #Create a dummy readme to npm doesnt keep complaining
 touch backend/README.md
