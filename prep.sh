@@ -24,6 +24,8 @@ popd
 #Directory for logs
 mkdir -p logs
 
+scripts/selfsigngen.sh > $LOG
+
 #Create a dummy readme to npm doesnt keep complaining
 touch backend/README.md
 echo "Dummy" >> backend/README.md
