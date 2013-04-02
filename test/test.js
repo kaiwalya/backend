@@ -45,7 +45,7 @@ describe('Website', function () {
 		var opt = {
 			url: ep + "/",
 			method: 'GET',
-			ca: site.config.certifyingAuthority
+			ca: site.config.certifyingAuthorities
 		};
 		request(opt, function (err, res, body) {
 			if (err) {
