@@ -15,7 +15,7 @@ var makeCovStr = function (f) {
 };
 
 
-var covLimit = 84;
+var covLimit = 90;
 var errCode = 0;
 var makeLimitErrString = function (f) {
 	if (f < covLimit) {
