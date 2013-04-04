@@ -16,14 +16,15 @@ describe('service', function () {
 				var ep = service.config.uri;
 				var opt = {
 					url: ep + "/version",
-					method: 'GET'
+					method: 'GET',
+					ca: service.config.certifyingAuthorities
 				};
 				request(opt, function (err, res, body) {
 					if (typeof body === "string") {
 						done();
 					}
 					else {
-						throw "API is expected to return string";
+						throw new Error("API is expected to return string");
 					}
 				});
 			});
