@@ -1,5 +1,6 @@
 . ~/.nvm/nvm.sh
-pwd
+nvm use 0.10.1
+mkdir -p logs
 APILOGFILE=`pwd -P`'/logs/api.log'
 SITELOGFILE=`pwd -P`'/logs/site.log'
 echo "" > $APILOGFILE
