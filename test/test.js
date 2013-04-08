@@ -16,17 +16,17 @@ var perServerTest = function (Server) {
 		assert.strictEqual(typeof Server, 'function');
 	});
 
-	it('Which accepts a single parameter', function () {
+	it('Which accepts one parameters', function () {
 		assert.strictEqual(Server.length, 1);
 	});
 
 };
 
-var perServerConfigStartStopTest = function (Server, name, config) {
+var perServerConfigStartStopTest = function (Server, name, config, configName) {
 	describe('Works in ' + name + ' config ', function () {
 		var server;
 		it('Constructs an object of class Server', function () {
-			server = new Server(config);
+			server = new Server(config.loadConfig(configName));
 			assert.strictEqual(server.constructor, Server);
 		});
 		describe('function initialize(callback),', function () {
@@ -72,34 +72,46 @@ ServerConfigTester.prototype.testWithFunction = function (testFunc) {
 };
 
 
-var generateLocalhostConfig = function (name, port, secure) {
+var generateLocalhostConfig = function (name, handler, port, secure) {
 	var ret = {};
-	ret.name = name;
+	ret._handler = handler;
 	ret.hostName = "localhost";
 	ret.port = port;
-	ret.secure = secure;
-	if (ret.secure) {
-		ret.tlsInfo = {
-			"certificateFile": __dirname + "/../../config/certs/localhost.crt",
-			"keyFile": __dirname + "/../../config/certs/localhost.key",
-			"certifyingAuthorities": [__dirname + "/../../config/certs/localhost.crt"]
+	if (secure) {
+		ret._tls = {
+			"certificateFile": "../../config/certs/localhost.crt",
+			"keyFile": "../../config/certs/localhost.key",
+			"certifyingAuthorities": ["../../config/certs/localhost.crt"]
 		};
 	}
-	ret.logFile = __dirname + "/../../logs/" + name + ".log";
-	ret.logLevel = "debug";
+	ret._log = {
+		filePath: __dirname + "/../../logs/" + name + ".log",
+		level: "debug"
+	};
 	return ret;
 };
 
-var usapicon = function (name) {return generateLocalhostConfig(name + "_TestInsecureAPI", 9999, false); };
-var sapicon = function (name) {return generateLocalhostConfig(name + "_TestSecureAPI", 9999, true); };
-var ussitecon = function (name) {return generateLocalhostConfig(name + "_TestInsecureSite", 10000, false); };
-var ssitecon = function (name) {return generateLocalhostConfig(name + "_TestSecureSite", 10000, true); };
+var handlerAPI = {
+	module: "../lib/service.js",
+	namespace: ["Server"]
+};
+
+var handlerSite = {
+	module: "../lib/site.js",
+	namespace: ["Server"]
+};
+
+var usapicon = function (name) {return generateLocalhostConfig(name + "_TestInsecureAPI", handlerAPI, 9999, false); };
+var sapicon = function (name) {return generateLocalhostConfig(name + "_TestSecureAPI", handlerAPI, 9999, true); };
+var ussitecon = function (name) {return generateLocalhostConfig(name + "_TestInsecureSite", handlerSite, 10000, false); };
+var ssitecon = function (name) {return generateLocalhostConfig(name + "_TestSecureSite", handlerSite, 10000, true); };
 
 var getParentConfig = function (name, sapi, ssite) {
 	var ret = {};
 	ret.api = sapi ? sapicon(name) : usapicon(name);
 	ret.site = ssite ? ssitecon(name): ussitecon(name);
-	return new Config(ret);
+	ret.site.apiConfig = "api";
+	return new Config(ret, __dirname);
 };
 
 describe('module service (' + apiPath + '),', function () {
@@ -133,7 +145,7 @@ describe('module service (' + apiPath + '),', function () {
 			var server;
 			describe('API ' + name, function () {
 				beforeEach(function (done) {
-					server = new Server(config);
+					server = new Server(config.loadConfig("api"));
 					server.initialize(function () {
 						server.start(function () {
 							done();
@@ -153,8 +165,10 @@ describe('module service (' + apiPath + '),', function () {
 							var opt = {
 								url: ep + "/version",
 								method: 'GET',
-								ca: server.config.certifyingAuthorities
 							};
+							if (server.config.tls) {
+								opt.ca = server.config.tls.certifyingAuthorities;
+							}
 							request(opt, function (err, res, body) {
 								if (err) throw err;
 								assert.strictEqual(typeof body, 'string');
@@ -170,8 +184,10 @@ describe('module service (' + apiPath + '),', function () {
 							var opt = {
 								url: ep + "/version",
 								method: 'GET',
-								ca: server.config.certifyingAuthorities
 							};
+							if (server.config.tls) {
+								opt.ca = server.config.tls.certifyingAuthorities;
+							}
 							var asks = maxParellel;
 							var ans = maxParellel;
 							var onRequestComplete = function (err, res, body) {
@@ -195,7 +211,9 @@ describe('module service (' + apiPath + '),', function () {
 
 
 		var configTester = new ServerConfigTester(Server, configArr);
-		configTester.testWithFunction(perServerConfigStartStopTest);
+		configTester.testWithFunction(function (Server, name, config) {
+			perServerConfigStartStopTest(Server, name, config, "api");
+		});
 		configTester.testWithFunction(testAPI);
 	});
 });
@@ -240,9 +258,11 @@ describe('module site (' + sitePath + '),', function () {
 		var testRoutes = function (Server, name, config) {
 			describe('Routes ' + name + ',', function () {
 				beforeEach(function (done) {
-					var api = require(packageRoot + apiPath);
-					apiServer = new api.Server(config);
-					server = new Server(config);
+					var apiConfig = config.loadConfig("api");
+					var siteConfig = config.loadConfig("site");
+					apiServer = new apiConfig.handler(apiConfig);
+					assert(Server === siteConfig.handler);
+					server = new siteConfig.handler(siteConfig);
 					apiServer.initialize(function () {
 						server.initialize(function () {
 							apiServer.start(function () {
@@ -267,8 +287,10 @@ describe('module site (' + sitePath + '),', function () {
 						var opt = {
 							url: ep + "/",
 							method: 'GET',
-							ca: server.config.certifyingAuthorities
 						};
+						if (server.config.tls) {
+							opt.ca = server.config.tls.certifyingAuthorities;
+						}
 						request(opt, function (err, res, body) {
 							if (err) {
 								server.config.log.info(err);
@@ -286,7 +308,9 @@ describe('module site (' + sitePath + '),', function () {
 			});
 		};
 		var configTester = new ServerConfigTester(site.Server, configArr);
-		configTester.testWithFunction(perServerConfigStartStopTest);
+		configTester.testWithFunction(function (Server, name, config) {
+			perServerConfigStartStopTest(Server, name, config, "site");
+		});
 		configTester.testWithFunction(testRoutes);
 	});
 });
