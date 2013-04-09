@@ -28,25 +28,10 @@ setTimeout(function () {
 			});
 		}, function (err) {
 			if (err) throw err;
-			async.eachSeries(servers, function (server, cb) {
-				server.stop(cb);
-			});
+			////Test code to stop all servers
+			//async.eachSeries(servers, function (server, cb) {
+			//	server.stop(cb);
+			//});
 		});
 	});
-	/*
-	var api = new API(config);
-	var site = new Site(config);
-	api.initialize(function (err) {
-		checkErr(err);
-		site.initialize(function (err) {
-			checkErr(err);
-			api.start(function (err) {
-				checkErr(err);
-				site.start(function (err) {
-					checkErr(err);
-				});
-			});
-		});
-	});
-*/
 });

@@ -339,6 +339,27 @@ describe('module mongo (' + mongoPath + '),', function () {
 		configTester.testWithFunction(function (Server, name, config) {
 			perServerConfigStartStopTest(Server, name, config, "mongod");
 		});
+		it('Should fail to start if another instance is already running', function (done) {
+			var config = new Config().loadConfig('mongod');
+			var s1 = new config.handler(config);
+			var s2 = new config.handler(config);
+			s1.initialize(function (err) {
+				if (err) throw err;
+				s2.initialize(function (err) {
+					if (err) throw err;
+					s1.start(function (err) {
+						if (err) throw err;
+						s2.start(function (err) {
+							if (!err) throw new Error("This instance should have failed to start");
+							s1.stop(function (err) {
+								if (err) throw err;
+								done();
+							});
+						});
+					});
+				});
+			});
+		});
 	});
 });
 
