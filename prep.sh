@@ -32,3 +32,9 @@ mkdir -p logs
 touch backend/README.md
 echo "Dummy" >> backend/README.md
 
+#Tell used to install mongod if not found
+mongoat=$(which mongod)
+if [ ! -x "$mongoat" ] ; then
+    echo "mongod not found. Please install mongodb"
+    exit -1
+fi

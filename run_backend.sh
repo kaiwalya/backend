@@ -1,3 +1,10 @@
+mongoat=$(which mongod)
+if [ ! -x "$mongoat" ] ; then
+    echo "mongod not found. Please install mongodb"
+    exit -1
+fi
+
+
 . ~/.nvm/nvm.sh
 nvm use 0.10.1
 mkdir -p logs
