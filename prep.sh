@@ -1,5 +1,7 @@
 touch ~/.profile
 
+OS=`uname`
+
 if [ ! -e ~/.nvm/install.sh ];
 then
 	echo "Installing NVM..."
