@@ -24,7 +24,7 @@ describe('module config (lib/config.js),', function () {
 				b: {},
 				c: {
 					_handler: {
-						module: __dirname + "/config.js",
+						module: __filename,
 						namespace: ["TestExport"]
 					},
 					_tls: {

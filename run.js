@@ -28,6 +28,9 @@ setTimeout(function () {
 			});
 		}, function (err) {
 			if (err) throw err;
+			async.eachSeries(servers, function (server, cb) {
+				server.stop(cb);
+			});
 		});
 	});
 	/*

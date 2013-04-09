@@ -5,7 +5,6 @@ var path = require('path');
 var packageRoot = path.normalize(__dirname + '/../');
 
 //We ensure that config tests run earlier
-require('./config.js');
 var Config = require(packageRoot + "lib/config").Config;
 var packageConfig = JSON.parse(fs.readFileSync(packageRoot + "package.json").toString());
 var apiPath = "lib/service";
@@ -314,3 +313,32 @@ describe('module site (' + sitePath + '),', function () {
 		configTester.testWithFunction(testRoutes);
 	});
 });
+
+
+
+var mongoPath = "lib/mongo";
+describe('module mongo (' + mongoPath + '),', function () {
+	it('service = require(' + packageRoot + mongoPath + ')', function () {
+		require(packageRoot + mongoPath);
+	});
+	it('Exports service.Server', function () {
+		var service = require(packageRoot + mongoPath);
+		var Server = service.Server;
+		assert.ok(Server, "Server not exported");
+	});
+	describe('class Server,', function () {
+		var mongo = require(packageRoot + mongoPath);
+		perServerTest(mongo.Server);
+		var configArr = [
+			{
+				name: 'default',
+				config: new Config()
+			},
+		];
+		var configTester = new ServerConfigTester(mongo.Server, configArr);
+		configTester.testWithFunction(function (Server, name, config) {
+			perServerConfigStartStopTest(Server, name, config, "mongod");
+		});
+	});
+});
+
