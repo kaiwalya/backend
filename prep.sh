@@ -11,8 +11,8 @@ else
 	~/.nvm/install.sh
 fi
 . ~/.nvm/nvm.sh
-nvm install 0.10.1
-nvm use 0.10.1
+nvm install 0.10.3
+nvm use 0.10.3
 npm install -g jake
 npm install -g bunyan
 npm install -g jshint
@@ -21,6 +21,7 @@ npm install -g node-dev
 npm install -g supervisor
 npm install -g mocha
 npm install -g jscover
+npm install -g typescript
 pushd backend
 npm install
 popd
