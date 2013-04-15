@@ -110,6 +110,7 @@ var getParentConfig = function (name, sapi, ssite) {
 	ret.api = sapi ? sapicon(name) : usapicon(name);
 	ret.site = ssite ? ssitecon(name): ussitecon(name);
 	ret.site.apiConfig = "api";
+	ret.site.wwwRoot = "../../www";
 	return new Config(ret, __dirname);
 };
 
@@ -175,6 +176,7 @@ describe('module service (' + apiPath + '),', function () {
 								done();
 							});
 						});
+						/*
 						var maxParellel = 1000;
 						it('Withstands alteast ' + maxParellel + ' parellel requests', function (done) {
 							this.timeout(300 + Math.floor(maxParellel * 1.5));
@@ -203,6 +205,7 @@ describe('module service (' + apiPath + '),', function () {
 								asks = asks - 1;
 							}
 						});
+						*/
 					});
 				});
 			});
