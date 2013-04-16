@@ -18,6 +18,7 @@ var Config = loadLib('/config').Config;
 //var assert = require('assert');
 var AM = loadLib('/accounts/AccountManager');
 var AccountManager = AM.AccountManager;
+var MongooseConnection = AM.MongooseConnection;
 
 var mongoCodeConfig;
 var mongoServer;
@@ -59,14 +60,19 @@ describe('AccountManager', function () {
 	});
 	var singletonAM;
 	var newAM = function (done) {
-		if (!singletonAM)
-			singletonAM = new AccountManager(function (err) {
-				if (err) throw new Error(err);
+		new MongooseConnection(function (err, mc) {
+			if (err) return done(err);
+			if (!singletonAM) {
+				new AccountManager(function (err, am) {
+					if (err) throw new Error(err);
+					singletonAM = am;
+					return done(null, singletonAM);
+				}, mc, mongoServer.config.log);
+			}
+			else {
 				return done(null, singletonAM);
-			}, "mongodb://localhost:9099", 'test_accountmanager', mongoServer.config.log);
-		else {
-			return done(null, singletonAM);
-		}
+			}
+		}, "mongodb://localhost:9099", 'test_accountmanager', mongoServer.config.log);
 	};
 
 	var uname = 'uname_' + utils.generateUUID(16);
@@ -282,6 +288,26 @@ describe('API', function () {
 				done();
 			}).form({uname: 'uname', pass: 'pass'});
 		});
+
+		it('POST /sessions - Should Fail login with missing pass', function (done) {
+			var ep = apiConfig.uri;
+			var opt = {
+				url: ep + "/sessions",
+				method: 'POST',
+				form: null,
+			};
+			if (apiConfig.tls) {
+				opt.ca = apiConfig.tls.certifyingAuthorities;
+			}
+			request.post(opt, function (err, res, body) {
+				if (err) throw err;
+				assert.strictEqual(res.statusCode, 400);
+				assert.strictEqual(res.headers['content-type'], 'application/json');
+				var jbody = JSON.parse(body);
+				assert(jbody.message);
+				done();
+			}).form({uname: 'uname'});
+		});
 		var authInfo;
 		it('POST /sessions - Should succeed login with the right username and password', function (done) {
 			var ep = apiConfig.uri;
@@ -305,6 +331,29 @@ describe('API', function () {
 			}).form({uname: uname, pass: pass});
 		});
 
+		var authInfo2;
+		it('POST /sessions - Should succeed login2 with the right username and password', function (done) {
+			var ep = apiConfig.uri;
+			var opt = {
+				url: ep + "/sessions",
+				method: 'POST',
+				form: null,
+			};
+			if (apiConfig.tls) {
+				opt.ca = apiConfig.tls.certifyingAuthorities;
+			}
+			request.post(opt, function (err, res, body) {
+				if (err) throw err;
+				assert.strictEqual(res.statusCode, 201);
+				assert.strictEqual(res.headers['content-type'], 'application/json');
+				var jbody = JSON.parse(body);
+				assert(jbody.sessionID);
+				assert(typeof jbody.sessionID, 'string');
+				authInfo2 = jbody.sessionID;
+				done();
+			}).form({uname: uname, pass: pass});
+		});
+
 		it('GET /sessions - Should fail with the wrong token', function (done) {
 			var ep = apiConfig.uri;
 			var opt = {
@@ -313,6 +362,25 @@ describe('API', function () {
 				headers: {
 					Authorization: 'Celebration ' + utils.generateUUID(authInfo.length),
 				},
+			};
+			if (apiConfig.tls) {
+				opt.ca = apiConfig.tls.certifyingAuthorities;
+			}
+			request.get(opt, function (err, res, body) {
+				if (err) throw err;
+				assert.strictEqual(res.statusCode, 401);
+				assert.strictEqual(res.headers['content-type'], 'application/json');
+				var jbody = JSON.parse(body);
+				assert(jbody.message);
+				done();
+			});
+		});
+
+		it('GET /sessions - Should fail with no token', function (done) {
+			var ep = apiConfig.uri;
+			var opt = {
+				url: ep + "/sessions",
+				method: 'GET',
 			};
 			if (apiConfig.tls) {
 				opt.ca = apiConfig.tls.certifyingAuthorities;
@@ -374,12 +442,13 @@ describe('API', function () {
 		it('HEAD /sessions/:sessionID - Should succeed with the right token', function (done) {
 			var ep = apiConfig.uri;
 			var opt = {
-				url: ep + "/sessions" + "/" + authInfo,
+				url: ep + "/sessions" + "/" + authInfo2,
 				method: 'HEAD',
 				headers: {
 					Authorization: 'Celebration ' + authInfo,
 				},
 			};
+			//console.log(opt);
 			if (apiConfig.tls) {
 				opt.ca = apiConfig.tls.certifyingAuthorities;
 			}
@@ -407,7 +476,8 @@ describe('API', function () {
 				assert.strictEqual(res.headers['content-type'], 'application/json');
 				var jbody = JSON.parse(body);
 				assert(jbody.sessions);
-				assert.strictEqual(jbody.sessions[0].sessionID, authInfo);
+				assert.strictEqual(jbody.sessions.length, 2);
+				assert(jbody.sessions[0].sessionID === authInfo && jbody.sessions[1].sessionID === authInfo2 || jbody.sessions[1].sessionID === authInfo && jbody.sessions[0].sessionID === authInfo2);
 				done();
 			});
 		});
@@ -430,5 +500,69 @@ describe('API', function () {
 				done();
 			});
 		});
+		it('DELETE /sessions/:sessionID - Should succeed with the right token', function (done) {
+			var ep = apiConfig.uri;
+			var opt = {
+				url: ep + "/sessions" + "/" + authInfo2,
+				method: 'DELETE',
+				headers: {
+					Authorization: 'Celebration ' + authInfo,
+				},
+			};
+			if (apiConfig.tls) {
+				opt.ca = apiConfig.tls.certifyingAuthorities;
+			}
+			request.del(opt, function (err, res) {
+				if (err) throw err;
+				assert.strictEqual(res.statusCode, 200);
+				done();
+			});
+		});
+
+		it('GET /sessions - Should succeed with the right token', function (done) {
+			var ep = apiConfig.uri;
+			var opt = {
+				url: ep + "/sessions",
+				method: 'GET',
+				headers: {
+					Authorization: 'Celebration ' + authInfo,
+				},
+			};
+			if (apiConfig.tls) {
+				opt.ca = apiConfig.tls.certifyingAuthorities;
+			}
+			request.get(opt, function (err, res, body) {
+				if (err) throw err;
+				assert.strictEqual(res.statusCode, 200);
+				assert.strictEqual(res.headers['content-type'], 'application/json');
+				var jbody = JSON.parse(body);
+				assert(jbody.sessions);
+				assert.strictEqual(jbody.sessions.length, 1);
+				assert.strictEqual(jbody.sessions[0].sessionID, authInfo);
+				done();
+			});
+		});
+
+
+		it('DELETE /sessions - Should succeed with the right token', function (done) {
+			var ep = apiConfig.uri;
+			var opt = {
+				url: ep + "/sessions",
+				method: 'DELETE',
+				headers: {
+					Authorization: 'Celebration ' + authInfo,
+				},
+			};
+			if (apiConfig.tls) {
+				opt.ca = apiConfig.tls.certifyingAuthorities;
+			}
+			request.del(opt, function (err, res) {
+				if (err) throw err;
+				assert.strictEqual(res.statusCode, 200);
+				done();
+			});
+		});
+
+
 	});
 });
