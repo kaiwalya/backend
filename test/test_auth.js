@@ -93,26 +93,48 @@ describe('AccountManager', function () {
 			}, uname, pass);
 		});
 	});
-
-	it('Should be able to login with that account', function (done) {
+	var sessionLoggedIn;
+	var sessionLoggedIn2;
+	it('Should be able to login with that account to create a session', function (done) {
 		newAM(function (err, am) {
-			am.login(function (err, accLoggedIn) {
-				if (err || !accLoggedIn) throw new Error('Account shouldbe found');
-				if (accCreated !== accLoggedIn) {
-					var string = 'Did not get expected account ' + JSON.stringify({
-						accCreated: {
-							type: typeof(accCreated),
-							data: accCreated
-						},
-						accLoggedIn: {
-							type: typeof(accLoggedIn),
-							data: accLoggedIn
-						}
-					});
-					throw new Error(string);
-				}
+			am.login(function (err, session) {
+				if (err || !session) throw new Error('Account shouldbe found');
+				sessionLoggedIn = session;
 				done();
 			}, uname, pass);
+		});
+	});
+
+	it('Should be able to login with that account again to create another session', function (done) {
+		newAM(function (err, am) {
+			am.login(function (err, session) {
+				if (err || !session) throw new Error('Account shouldbe found');
+				sessionLoggedIn2 = session;
+				done();
+			}, uname, pass);
+		});
+	});
+
+	it('Should be able to validate sessions', function (done) {
+		newAM(function (err, am) {
+			am.findSession(function (err) {
+				if (err) throw new Error('Session not validated');
+				am.findSession(function (err, sessions) {
+					if (err) throw new Error('Session not validated');
+					assert.strictEqual(sessions.length, 2);
+					assert(sessions[0] === sessionLoggedIn && sessions[1] === sessionLoggedIn2 || sessions[0] === sessionLoggedIn2 && sessions[1] === sessionLoggedIn);
+					done();
+				}, sessionLoggedIn2);
+			}, sessionLoggedIn);
+		});
+	});
+
+	it('Should be able to logout from that session', function (done) {
+		newAM(function (err, am) {
+			am.logout(function (err) {
+				if (err) throw new Error('Logout Failed');
+				done();
+			}, sessionLoggedIn);
 		});
 	});
 
@@ -198,6 +220,27 @@ describe('API', function () {
 				assert(typeof jbody.accountID === 'string');
 				done();
 			}).form({uname: uname, pass: pass});
+		});
+
+
+		it('POST /accounts - Should Fail creation with missing password', function (done) {
+			var ep = apiConfig.uri;
+			var opt = {
+				url: ep + "/accounts",
+				method: 'POST',
+				form: null,
+			};
+			if (apiConfig.tls) {
+				opt.ca = apiConfig.tls.certifyingAuthorities;
+			}
+			request.post(opt, function (err, res, body) {
+				if (err) throw err;
+				assert.strictEqual(res.statusCode, 400);
+				assert.strictEqual(res.headers['content-type'], 'application/json');
+				var jbody = JSON.parse(body);
+				assert(jbody.message);
+				done();
+			}).form({uname: uname});
 		});
 
 		it('POST /accounts - Should Fail creation with the same username', function (done) {
