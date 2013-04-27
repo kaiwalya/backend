@@ -1,5 +1,8 @@
 SHELL := /bin/bash
-BUILDDIR ?= .build
+BACKENDDIR ?= $(shell pwd -P)
+BUILDDIR ?= $(BACKENDDIR)/.build
+LOGFILE ?= $(BUILDDIR)/build.log
+
 all: help
 help:
 	@echo
@@ -26,11 +29,9 @@ help:
 
 VERBOSE?=0
 ifeq ($(VERBOSE), 0)
-	LOGFILE = $(shell pwd -P)/$(BUILDDIR)/build.log
 	LOG= >> $(LOGFILE)
 	HIDECMD=@
 else
-	LOGFILE=$(shell pwd -P)/$(BUILDDIR)/build.log
 	LOG=
 	HIDECMD=
 endif
@@ -53,7 +54,7 @@ run: run_backend
 
 #========= Prepare ==========
 prep:
-	$(HIDECMD) ./scripts/prep.sh
+	$(HIDECMD) $(BACKENDDIR)/scripts/prep.sh
 .PHONY: prep
 
 include targets.makefile

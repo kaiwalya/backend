@@ -4,7 +4,7 @@ LOADNVMCMD=. ~/.nvm/nvm.sh && nvm use 0.10.3 > /dev/null
 
 build_backend: build_prep
 	@echo "Building Backend..."
-	$(HIDECMD) $(HIDECMD) scripts/selfsigngen.sh $(LOG) 2>&1
+	$(HIDECMD) $(HIDECMD) $(BACKENDDIR)/scripts/selfsigngen.sh $(LOG) 2>&1
 	$(HIDECMD) $(LOADNVMCMD) && npm install
 	$(HIDECMD) $(LOADNVMCMD) && jshint .
 .PHONY:build_backend
@@ -27,7 +27,7 @@ test_backend_cov:
 	$(HIDECMD) mkdir -p $(BUILDDIR)/test_backend/cov/logs
 	$(HIDECMD) cp -r * $(BUILDDIR)/test_backend/cov
 	$(HIDECMD) rm -rf $(BUILDDIR)/test_backend/cov/lib
-	$(HIDECMD) $(LOADNVMCMD) && jscover ./lib $(BUILDDIR)/test_backend/cov/lib
+	$(HIDECMD) $(LOADNVMCMD) && jscover $(BACKENDDIR)/lib $(BUILDDIR)/test_backend/cov/lib
 #	$(HIDECMD) cp -r ./node_modules ./$(BUILDDIR)/test_backend/cov/
 ##Enable this when problems running coverage to check if non coverage unit tests are passing
 #$(HIDECMD) $(LOADNVMCMD) && mocha -R spec $(BUILDDIR)/test_backend/cov/backend/test
