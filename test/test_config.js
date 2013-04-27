@@ -28,9 +28,9 @@ describe('module config (lib/config.js),', function () {
 						namespace: ["TestExport"]
 					},
 					_tls: {
-						certificateFile: "../../config/certs/localhost.crt",
-						keyFile: "../../config/certs/localhost.key",
-						certifyingAuthorities: ["../../config/certs/localhost.crt"]
+						certificateFile: "../config/certs/localhost.crt",
+						keyFile: "../config/certs/localhost.key",
+						certifyingAuthorities: ["../config/certs/localhost.crt"]
 					}
 				},
 				_metaConfig: {

@@ -1,0 +1,57 @@
+{
+	"api":{
+		"_handler": {
+			"module":"../lib/service.js",
+			"namespace": ["Server"]
+		},
+		"hostName": "localhost",
+		"port": 8474,
+		"mongo": "mongodb://localhost:8476",
+		"_tls": {
+			"certificateFile": "certs/localhost.crt",
+			"keyFile": "certs/localhost.key",
+			"certifyingAuthorities":["certs/localhost.crt"]
+		},
+		"_log": {
+			"filePath": "../logs/api.log",
+			"level": "debug"
+		}
+	},
+	"site":{
+		"_handler": {
+			"module":"../lib/site.js",
+			"namespace": ["Server"]
+		},
+		"hostName": "localhost",
+		"port": 8475,
+		"_tls": {
+			"certificateFile": "certs/localhost.crt",
+			"keyFile": "certs/localhost.key",
+			"certifyingAuthorities":["certs/localhost.crt"]
+		},
+		"apiRoot": "https://localhost:8474",
+		"wwwRoot": "../www",
+		"_log": {
+			"filePath": "../logs/site.log",
+			"level": "debug"
+		}
+	},
+
+	"mongod": {
+		"_handler": {
+			"module": "../lib/mongo.js",
+			"namespace": ["Server"]
+		},
+		"hostName": "localhost",
+		"port": 8476,
+		"dbLocation": "../logs/db",
+		"_log": {
+			"filePath": "../logs/mongo.log",
+			"level": "debug"
+		}
+	},
+
+	"_metaConfig": {
+		"_linearOrdering": ["mongod", "api", "site"]
+	}
+}

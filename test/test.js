@@ -78,13 +78,13 @@ var generateLocalhostConfig = function (name, handler, port, secure) {
 	ret.port = port;
 	if (secure) {
 		ret._tls = {
-			"certificateFile": "../../config/certs/localhost.crt",
-			"keyFile": "../../config/certs/localhost.key",
-			"certifyingAuthorities": ["../../config/certs/localhost.crt"]
+			"certificateFile": "../config/certs/localhost.crt",
+			"keyFile": "../config/certs/localhost.key",
+			"certifyingAuthorities": ["../config/certs/localhost.crt"]
 		};
 	}
 	ret._log = {
-		filePath: __dirname + "/../../logs/" + name + ".log",
+		filePath: __dirname + "/../logs/" + name + ".log",
 		level: "debug"
 	};
 	return ret;
@@ -110,7 +110,7 @@ var getParentConfig = function (name, sapi, ssite) {
 	ret.api = sapi ? sapicon(name) : usapicon(name);
 	ret.site = ssite ? ssitecon(name): ussitecon(name);
 	ret.site.apiConfig = "api";
-	ret.site.wwwRoot = "../../www";
+	ret.site.wwwRoot = "../www";
 	return new Config(ret, __dirname);
 };
 

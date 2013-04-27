@@ -22,16 +22,10 @@ npm install -g supervisor
 npm install -g mocha
 npm install -g jscover
 npm install -g typescript
-pushd backend
 npm install
-popd
 
 #Directory for logs
 mkdir -p logs
-
-#Create a dummy readme to npm doesnt keep complaining
-touch backend/README.md
-echo "Dummy" >> backend/README.md
 
 #Tell used to install mongod if not found
 mongoat=$(which mongod)

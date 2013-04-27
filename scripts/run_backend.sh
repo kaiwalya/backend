@@ -13,13 +13,12 @@ SITELOGFILE=`pwd -P`'/logs/site.log'
 MONGOLOGFILE=`pwd -P`'/logs/mongo.log'
 echo "" > $APILOGFILE
 echo "" > $SITELOGFILE
+echo "" > $MONGOLOGFILE
 tail -n 0 -f $APILOGFILE | bunyan &
 tail -n 0 -f $SITELOGFILE | bunyan &
 tail -n 0 -f $MONGOLOGFILE | bunyan &
 echo "Control + C to Quit"
-tsc --module amd --target ES5 -w www/scripts/*.ts &
-node backend
-ps aux | grep "tsc --module amd --target ES5 -w www/scripts/"  | grep node | awk '{print $2}' | xargs -L 1 'kill'
+node .
 ps aux | grep $APILOGFILE | grep tail | awk '{print $2}' | xargs -L 1 'kill'
 ps aux | grep $SITELOGFILE | grep tail | awk '{print $2}' | xargs -L 1 'kill'
 ps aux | grep $MONGOLOGFILE | grep tail | awk '{print $2}' | xargs -L 1 'kill'

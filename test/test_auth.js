@@ -1,13 +1,13 @@
 'use strict';
 var assert = require('assert');
 
-var packageRoot = __dirname + "/../..";
+var packageRoot = __dirname + "/..";
 
 var libPath = function (modulePath) {
-	return packageRoot + '/backend/lib' + modulePath;
+	return packageRoot + '/lib' + modulePath;
 };
 var logPath = function (modulePath) {
-	return libPath('/../../logs' + modulePath);
+	return libPath('/../logs' + modulePath);
 };
 var loadLib = function (modulePath) {
 	return require(libPath(modulePath));

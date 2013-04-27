@@ -1,0 +1,5 @@
+**/node_modules/**
+build/
+app/external
+www/spec
+www/scripts
