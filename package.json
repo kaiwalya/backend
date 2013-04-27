@@ -1,0 +1,25 @@
+{
+  "name": "Backend",
+  "version": "0.0.1",
+  "author": "Kaiwalya Kher <knkher@gmail.com>",
+  "description": "A boilerplace backend which hosts a website and rest api server",
+  "main": "./run.js",
+  "dependencies": {
+    "nconf": ">=0.6.7",
+    "bunyan": ">=0.18.3",
+    "restify": "=2.x.x",
+    "mocha": "=1.x.x",
+    "passport": ">=0.1.6",
+    "mongodb": "1.x.x",
+    "mongoose": "3.x.x",
+    "request": "=2.x.x",
+    "nock": ">=0.16.0",
+    "express": ">=3.1.0",
+    "async": "~0.2.6"
+  },
+  "readmeFilename": "README.md",
+  "scripts": {
+    "ready": "npm update",
+    "test": "mocha"
+  }
+}
