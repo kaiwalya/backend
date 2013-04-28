@@ -1,23 +1,24 @@
 #========  Backend ==============
 
-LOADNVMCMD=. ~/.nvm/nvm.sh && nvm use 0.10.3 > /dev/null
+LOADNVMCMD =. ~/.nvm/nvm.sh && nvm use 0.10.3 > /dev/null 
+TOBACKEND = cd $(BACKENDDIR)
 
 build_backend: build_prep
-	@echo "Building Backend..."
+	@echo "Building Backend...$(BACKENDDIR)"
 	$(HIDECMD) $(HIDECMD) $(BACKENDDIR)/scripts/selfsigngen.sh $(LOG) 2>&1
-	$(HIDECMD) $(LOADNVMCMD) && npm install
-	$(HIDECMD) $(LOADNVMCMD) && jshint .
+	$(HIDECMD) $(LOADNVMCMD) && $(TOBACKEND) && npm install
+	$(HIDECMD) $(LOADNVMCMD) && $(TOBACKEND) && jshint .
 .PHONY:build_backend
 
 clean_backend:
-	@echo "Cleaning Backend..."
+	@echo "Cleaning Backend...$(BUILDDIR)/test_backend"
 	@rm -rf $(BUILDDIR)/test_backend
 .PHONY: clean_backend
 
 test_backend_unit:
 	$(HIDECMD) mkdir -p $(BUILDDIR)/test_backend/unit
 	$(HIDECMD) mkdir -p $(BUILDDIR)/test_backend/unit/logs
-	$(HIDECMD) cp -r * $(BUILDDIR)/test_backend/unit
+	$(HIDECMD) $(TOBACKEND) && cp -r * $(BUILDDIR)/test_backend/unit
 	$(HIDECMD) $(LOADNVMCMD) && cd $(BUILDDIR)/test_backend/unit && mocha -R spec test
 .PHONY: test_backend_unit
 
@@ -25,7 +26,7 @@ test_backend_unit:
 test_backend_cov:
 	$(HIDECMD) mkdir -p $(BUILDDIR)/test_backend/cov
 	$(HIDECMD) mkdir -p $(BUILDDIR)/test_backend/cov/logs
-	$(HIDECMD) cp -r * $(BUILDDIR)/test_backend/cov
+	$(HIDECMD) $(TOBACKEND) && cp -r * $(BUILDDIR)/test_backend/cov
 	$(HIDECMD) rm -rf $(BUILDDIR)/test_backend/cov/lib
 	$(HIDECMD) $(LOADNVMCMD) && jscover $(BACKENDDIR)/lib $(BUILDDIR)/test_backend/cov/lib
 #	$(HIDECMD) cp -r ./node_modules ./$(BUILDDIR)/test_backend/cov/
@@ -34,7 +35,7 @@ test_backend_cov:
 	$(HIDECMD) $(LOADNVMCMD) && cd $(BUILDDIR)/test_backend/cov && JSCOV=1 mocha -R json-cov test > coverage.json
 	$(HIDECMD) $(LOADNVMCMD) && cd $(BUILDDIR)/test_backend/cov && JSCOV=1 mocha -R html-cov test > coverage.html
 	$(HIDECMD) echo "coverage at file://`pwd -P`/$(BUILDDIR)/test_backend/cov/coverage.html"
-	$(HIDECMD) $(LOADNVMCMD) && node scripts/checkCov.js $(BUILDDIR)/test_backend/cov/coverage.json
+	$(HIDECMD) $(LOADNVMCMD) && $(TOBACKEND) && node scripts/checkCov.js $(BUILDDIR)/test_backend/cov/coverage.json
 .PHONY: test_backend_cov
 
 test_backend: build_backend
@@ -63,5 +64,5 @@ debug_backend: kill_backend
 
 run_backend: build_backend
 	$(HIDECMD) echo 'Running Backend...'
-	-$(HIDECMD) ./scripts/run_backend.sh
+	-$(HIDECMD) $(TOBACKEND) && scripts/run_backend.sh $(NODECONFIG)
 

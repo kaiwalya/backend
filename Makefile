@@ -2,6 +2,7 @@ SHELL := /bin/bash
 BACKENDDIR ?= $(shell pwd -P)
 BUILDDIR ?= $(BACKENDDIR)/.build
 LOGFILE ?= $(BUILDDIR)/build.log
+NODECONFIG ?= --configurationFile=$(BACKENDDIR)/config/debug.json
 
 all: help
 help:
@@ -36,7 +37,8 @@ else
 	HIDECMD=
 endif
 
-build: build_backend
+build: build_prep
+	$(MAKE) build_backend
 
 build_prep:
 	@mkdir -p $(BUILDDIR)
