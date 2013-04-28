@@ -63,6 +63,8 @@ debug_backend: kill_backend
 .PHONY: debug_backend
 
 run_backend: build_backend
+	$(HIDECMD) $(MAKE) pre_run_backend
 	$(HIDECMD) echo 'Running Backend...'
 	-$(HIDECMD) $(TOBACKEND) && scripts/run_backend.sh $(NODECONFIG)
+	$(HIDECMD) $(MAKE) post_run_backend
 
