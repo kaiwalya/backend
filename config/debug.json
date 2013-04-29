@@ -7,6 +7,9 @@
 		"hostName": "localhost",
 		"port": 8474,
 		"mongo": "mongodb://localhost:8476",
+		"routes": [
+			"../routes/version"
+		],
 		"_tls": {
 			"certificateFile": "certs/localhost.crt",
 			"keyFile": "certs/localhost.key",

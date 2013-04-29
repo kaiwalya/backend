@@ -47,7 +47,7 @@ build_prep:
 clean: clean_backend
 	@mkdir -p $(BUILDDIR)
 	@rm -f $(LOGFILE)
-	@rmdir -p $(BUILDDIR)
+	@rm -r "$(BUILDDIR)"
 test: test_backend
 rebuild: rebuild_backend
 run: run_backend
