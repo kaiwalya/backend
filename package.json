@@ -1,5 +1,5 @@
 {
-  "name": "Backend",
+  "name": "backend",
   "version": "0.0.1",
   "author": "Kaiwalya Kher <knkher@gmail.com>",
   "description": "A boilerplace backend which hosts a website and rest api server",
