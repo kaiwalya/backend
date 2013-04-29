@@ -71,7 +71,7 @@ ServerConfigTester.prototype.testWithFunction = function (testFunc) {
 };
 
 
-var generateLocalhostConfig = function (name, handler, port, secure) {
+var generateLocalhostConfig = function (name, handler, port, secure, routes) {
 	var ret = {};
 	ret._handler = handler;
 	ret.hostName = "localhost";
@@ -82,6 +82,9 @@ var generateLocalhostConfig = function (name, handler, port, secure) {
 			"keyFile": "../config/certs/localhost.key",
 			"certifyingAuthorities": ["../config/certs/localhost.crt"]
 		};
+	}
+	if (routes) {
+		ret.routes = routes;
 	}
 	ret._log = {
 		filePath: __dirname + "/../logs/" + name + ".log",
@@ -100,8 +103,12 @@ var handlerSite = {
 	namespace: ["Server"]
 };
 
-var usapicon = function (name) {return generateLocalhostConfig(name + "_TestInsecureAPI", handlerAPI, 9999, false); };
-var sapicon = function (name) {return generateLocalhostConfig(name + "_TestSecureAPI", handlerAPI, 9999, true); };
+var apiRoutes = [
+	"../lib/routes/version"
+];
+
+var usapicon = function (name) {return generateLocalhostConfig(name + "_TestInsecureAPI", handlerAPI, 9999, false, apiRoutes); };
+var sapicon = function (name) {return generateLocalhostConfig(name + "_TestSecureAPI", handlerAPI, 9999, true, apiRoutes); };
 var ussitecon = function (name) {return generateLocalhostConfig(name + "_TestInsecureSite", handlerSite, 10000, false); };
 var ssitecon = function (name) {return generateLocalhostConfig(name + "_TestSecureSite", handlerSite, 10000, true); };
 

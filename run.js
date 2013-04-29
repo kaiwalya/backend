@@ -9,9 +9,10 @@ var checkErr = function (err) {
 };
 */
 
-setTimeout(function () {
+var servers = [];
+
+exports.start = function (callback) {
 	var config = (new Config()).rootConfig();
-	var servers = [];
 	//var len = config.metaConfig.linearOrdering;
 	async.eachSeries(config.metaConfig.linearOrdering, function (con, cb) {
 		//console.log(con);
@@ -27,11 +28,16 @@ setTimeout(function () {
 				cb(err);
 			});
 		}, function (err) {
-			if (err) throw err;
-			////Test code to stop all servers
-			//async.eachSeries(servers, function (server, cb) {
-			//	server.stop(cb);
-			//});
+			callback(err);
 		});
 	});
-});
+};
+
+exports.stop = function (cb) {
+	//Test code to stop all servers
+	async.eachSeries(servers, function (server, next) {
+		server.stop(next);
+	}, function (err) {
+		cb(err);
+	});
+};

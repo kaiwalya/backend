@@ -34,7 +34,7 @@ test_backend_cov:
 #$(HIDECMD) $(LOADNVMCMD) && mocha -R spec $(BUILDDIR)/test_backend/cov/backend/test
 	$(HIDECMD) $(LOADNVMCMD) && cd $(BUILDDIR)/test_backend/cov && JSCOV=1 mocha -R json-cov test > coverage.json
 	$(HIDECMD) $(LOADNVMCMD) && cd $(BUILDDIR)/test_backend/cov && JSCOV=1 mocha -R html-cov test > coverage.html
-	$(HIDECMD) echo "coverage at file://`pwd -P`/$(BUILDDIR)/test_backend/cov/coverage.html"
+	$(HIDECMD) echo "coverage at file://$(BUILDDIR)/test_backend/cov/coverage.html"
 	$(HIDECMD) $(LOADNVMCMD) && $(TOBACKEND) && node scripts/checkCov.js $(BUILDDIR)/test_backend/cov/coverage.json
 .PHONY: test_backend_cov
 
