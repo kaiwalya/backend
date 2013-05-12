@@ -9,12 +9,8 @@
     "bunyan": ">=0.18.3",
     "restify": "=2.x.x",
     "mocha": "=1.x.x",
-    "passport": ">=0.1.6",
     "mongodb": "1.x.x",
-    "mongoose": "3.x.x",
     "request": "=2.x.x",
-    "nock": ">=0.16.0",
-    "express": ">=3.1.0",
     "async": "~0.2.6"
   },
   "readmeFilename": "README.md",
